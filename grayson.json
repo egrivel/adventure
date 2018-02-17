@@ -1,0 +1,458 @@
+// Data file for the 'Grayson' planet.
+// Note: single-line comments are allowed in this file
+{
+  "type": "planet",
+  "id": "grayson",
+  "name": "Grayson",
+  "default-location": "hotel-room",
+  "locations": [
+    // ------------------------------------------------------------------------
+    // Location: Hotel Room
+    // ------------------------------------------------------------------------
+    {
+      "id": "hotel-room",
+      "name": "Hotel room",
+      "descr": "You are in a hotel room. It looks pretty much like any other hotel room you have ever seen. There is a bed, a night stand with a note card, a window, a bathroom, and a door to the west.",
+      "action": "if ($gl_time > 3*60*60) { out('You cannot return into the room'); set_location('hallway'); }",
+      "items": [
+        {
+          "name": "bed",
+          "descr": "Pretty much a standard bed."
+        },
+        {
+          "name": "night stand",
+          "alias": [
+            "stand"
+          ],
+          "descr": "There is a note card on the night stand."
+        },
+        {
+          "name": "note card",
+          "alias": [
+            "note", "card"
+          ],
+          "descr": "The note card reads:<br/>&nbsp;&nbsp;<strong>Grayson Hilton</strong><br/>&nbsp;&nbsp;Grayson City<br/>&nbsp;&nbsp;Check-out time: 11:00."
+        },
+        {
+          "name": "window",
+          "descr": "Looking out the window you see a non-descriptive city. You can see a glimpse of the space port at the South end of the city. Looking at the space port makes you wonder if this wasn&rsquo;t a bad idea, maybe you should go back home."
+        },
+        {
+          "name": "bathroom",
+          "descr": "You look into the bathroom but don&rsquo;t see anything out of the ordinary.<br/>While you&rsquo;re there anyway, you make use of the facilities.<br/><br/>Aaagh, that feels better!"
+        },
+        {
+          "type": "portable",
+          "name": "backpack",
+          "descr": "A medium-sized backpack.",
+          "sdescr": "a backpack"
+        },
+        {
+          "type": "portable",
+          "name": "sketchbook",
+          "descr": "An empty sketchbook. It may be fun to make drawings of interesting things you see.",
+          "sdescr": "a sketchbook"
+        }
+      ],
+      "exits": [
+        {
+          "name": "west",
+          "alias": [
+            "door"
+          ],
+          "location": "hallway"
+        }
+      ]
+    },
+
+    // ------------------------------------------------------------------------
+    // Location: Hallway
+    // ------------------------------------------------------------------------
+    {
+      "id": "hallway",
+      "name": "Hallway",
+      "descr": "A hotel hallway. There are plenty of doors, including one to the east. The south end of the hallway leads to the lobby.",
+      "exits": [
+        {
+          "name": "east",
+          "alias": [
+            "room", "hotel room"
+          ],
+          "location": "hotel-room"
+        },
+        {
+          "name": "south",
+          "alias": [
+            "lobby"
+          ],
+          "location": "lobby"
+        }
+      ]
+    },
+
+    // ------------------------------------------------------------------------
+    // Location: Lobby
+    // ------------------------------------------------------------------------
+    {
+      "id": "lobby",
+      "name": "Lobby",
+      "descr": "Lobby of the Grayson Hilton. The lobby looks impressive, with gold-colored trim around wood-colored panels but you are pretty sure it is all fake. The carpet is worn and the plants are plastic. This place has definitely seen better days!<br/>There is a front desk and a hallway to the north. On the west side are revolving doors leading out.",
+      "items": [
+        {
+          "name": "desk",
+          "alias": [
+            "front desk"
+          ],
+          "descr": "The front desk looks deserted right now. You don&rsquo;t see any way to get anyone&rsquo;s attention."
+        },
+        {
+          "name": "carpet",
+          "descr": "The carpet is definitely worn."
+        },
+        {
+          "name": "plants",
+          "descr": "The plants look great if you don&rsquo;t look too closely. If you do look closely, you see that they are not only fake but also very, very dusty."
+        }
+      ],
+      "exits": [
+        {
+          "name": "north",
+          "alias": [
+            "hallway", "corridor"
+          ],
+          "location": "hallway"
+        },
+        {
+          "name": "west",
+          "alias": [
+            "door", "doors", "revolving doors", "street"
+          ],
+          "location": "street-3"
+        }
+      ]
+    },
+
+    // ------------------------------------------------------------------------
+    // Location: Street 1
+    // ------------------------------------------------------------------------
+    {
+      "id": "street-1",
+      "name": "Street",
+      "descr": "Main Street. There is a hostel to the east. The space port is to the south.",
+      "exits": [
+        {
+          "name": "north",
+          "location": "street-2"
+        }
+      ]
+    },
+
+    // ------------------------------------------------------------------------
+    // Location: Street 2
+    // ------------------------------------------------------------------------
+    {
+      "id": "street-2",
+      "name": "Street",
+      "descr": "Main Street. There is a cafetaria to the east.",
+      "exits": [
+        {
+          "name": "north",
+          "location": "street-3"
+        },
+        {
+          "name": "south",
+          "location": "street-1"
+        }
+      ]
+    },
+
+    // ------------------------------------------------------------------------
+    // Location: Street 3
+    // ------------------------------------------------------------------------
+    {
+      "id": "street-3",
+      "name": "Street",
+      "descr": "You are on Main Street, which is reserved for pedestrian traffic only and runs from the space port in the south to city hall in the north. The street is bustling with people. The Grayson Hilton is to the east.",
+      "items": [
+        {
+          "name": "traffic",
+          "descr": "The only traffic here is foot traffic."
+        },
+        {
+          "name": "people",
+          "descr": "The people on the street look as if they have some place to go and are not interested in talking to a stranger."
+        }
+      ],
+      "exits": [
+        {
+          "name": "east",
+          "alias": [
+            "hotel", "grayson", "grayson hotel"
+          ],
+          "location": "Lobby"
+        },
+        {
+          "name": "south",
+          "location": "street-2"
+        },
+        {
+          "name": "north",
+          "location": "street-4"
+        }
+      ]
+    },
+
+    // ------------------------------------------------------------------------
+    // Location: Street 4
+    // ------------------------------------------------------------------------
+    {
+      "id": "street-4",
+      "name": "Street",
+      "descr": "Main Street. There is a park to the west and a grocery store to the east.",
+      "exits": [
+        {
+          "name": "south",
+          "location": "street-3"
+        },
+        {
+          "name": "west",
+          "alias": ["park"],
+          "location": "park-1"
+        },
+        {
+          "name": "east",
+          "alias": ["grocery store", "store"],
+          "location": "grocery-store"
+        }
+      ]
+    },
+
+    // ------------------------------------------------------------------------
+    // Location: Street 5
+    // ------------------------------------------------------------------------
+    {
+      "id": "street-5",
+      "name": "Street",
+      "descr": "Main Street. There is a park to the west and a restaurant to the east. To the north, Main Street runs up to City Hall.",
+      "exits": [
+        {
+          "name": "south",
+          "location": "street-4"
+        },
+        {
+          "name": "west",
+          "alias": ["park"],
+          "location": "park-3"
+        },
+        {
+          "name": "east",
+          "alias": ["restaurant"],
+          "location": "restaurant"
+        },
+        {
+          "name": "north",
+          "alias": ["city hall"],
+          "location": "city-hall"
+        }
+      ]
+    },
+
+    // ------------------------------------------------------------------------
+    // Location: Grocery Store
+    // ------------------------------------------------------------------------
+    {
+      "id": "grocery-store",
+      "name": "Grocery Store",
+      "descr": "You can buy groceries here. You look around but do not see anything that takes your fancy. The exit of the store is to the west.",
+      "exits": [
+        {
+          "name": "west",
+          "alias": ["street, exit"],
+          "location": "street-4"
+        }
+      ]
+    },
+
+    // ------------------------------------------------------------------------
+    // Location: Park entrance
+    // ------------------------------------------------------------------------
+    {
+      "id": "park-1",
+      "name": "Park",
+      "descr": "You are on a path through the park. The path meanders north and east.",
+      "exits": [
+        {
+          "name": "east",
+          "alias": ["street, exit"],
+          "location": "street-4"
+        },
+        {
+          "name": "north",
+          "location": "park-2"
+        }
+      ]
+    },
+
+    // ------------------------------------------------------------------------
+    // Location: Park fountain
+    // ------------------------------------------------------------------------
+    {
+      "id": "park-2",
+      "name": "Fountain",
+      "descr": "A fountain of a mermaid is spraying water. There are benches around the fountain where artists sit and sketch the sculpture. The path continues to the north and south.",
+      "exits": [
+        {
+          "name": "south",
+          "location": "park-1"
+        },
+        {
+          "name": "north",
+          "location": "park3"
+        }
+      ]
+    },
+
+    // ------------------------------------------------------------------------
+    // Location: Park exit
+    // ------------------------------------------------------------------------
+    {
+      "id": "park-3",
+      "name": "Park",
+      "descr": "You are on a path through the park. The path meanders east and south.",
+      "exits": [
+        {
+          "name": "south",
+          "location": "park-2"
+        },
+        {
+          "name": "east",
+          "location": "street-5"
+        }
+      ]
+    },
+
+    // ------------------------------------------------------------------------
+    // Location: Cafetaria
+    // ------------------------------------------------------------------------
+    {
+      "id": "cafetaria",
+      "name": "Cafetaria",
+      "descr": "This looks like a place to get some cheap food. There is a sign on the back wall reading &ldquo;Help wanted. No experience necessary.&rdquo;",
+      "exits": [
+        {
+          "name": "west",
+          "alias": ["street", "exit"],
+          "location": "street-2"
+        }
+      ]
+    },
+
+    // ------------------------------------------------------------------------
+    // Location: Restaurant
+    // ------------------------------------------------------------------------
+    {
+      "id": "restaurant",
+      "name": "Restaurant",
+      "descr": "This looks like a pretty expensive restaurant. Probably more expensive than you can affort. There is a &ldquo;help wanted&rdquo; sign in the window.",
+      "items": [
+        {
+          "name": "sign",
+          "descr": "The sign reads &ldquo;Experienced waiters and waitresses needed. Excellent pay.&rdquo;"
+        }
+      ],
+      "exits": [
+        {
+          "name": "west",
+          "alias": ["exit", "street"],
+          "location": "street-5"
+        }
+      ]
+    },
+
+    // ------------------------------------------------------------------------
+    // Location: City Hall
+    // ------------------------------------------------------------------------
+    {
+      "id": "city-hall",
+      "name": "City Hall",
+      "descr": "You are in City Hall. A lot of busy people running around. The exit is to the south.",
+      "exits": [
+        {
+          "name": "south",
+          "alias": ["street", "exit"],
+          "location": "street-5"
+        }
+      ]
+    },
+
+    // ------------------------------------------------------------------------
+    // Location: Hostel
+    // ------------------------------------------------------------------------
+    {
+      "id": "hostel",
+      "name": "Hostel",
+      "descr": "A cheap place to sleep, only 5 credits a night for a bunk bed.",
+      "exits": [
+        {
+          "name": "west",
+          "alias": ["street", "exit"],
+          "location": "street-1"
+        }
+      ]
+    },
+
+    // ------------------------------------------------------------------------
+    // Location: Space Port
+    // ------------------------------------------------------------------------
+    {
+      "id": "space-port",
+      "name": "Space Port",
+      "descr": "Main entrance to the space port. There is a ticketing office to the west, a money exchange office to the east, and a gate to the terminals to the south. Exit to the street is to the north.",
+      "exits": [
+        {
+          "name": "north",
+          "alias": ["street"],
+          "location": "street-1"
+        }
+      ]
+    },
+    
+    // ------------------------------------------------------------------------
+    // Location: Space Port
+    // ------------------------------------------------------------------------
+    {
+      "id": "ticket-office",
+      "name": "Ticketing Office",
+      "descr": "Here you buy tickets for flights to different places on and off the planet. The young lady behind the counter is waiting for customers. There is a pricelist on the counter.",
+      "items": [
+        {
+          "name": "pricelist",
+          "descr": "<strong>Domestic shuttles:</strong><br/>&nbsp; &nbsp; Dawson - - sold out<br/>&nbsp; &nbsp; Hooch City - - 500 credits<br/>&nbsp; &nbsp; New Philly - - sold out<br/>&nbsp &nbsp; Lan-Chin - - 700 credit<br/>&nbsp; &nbsp; Phoebe - sold out<br/><br/><strong>Interstellar:</strong><br/>&nbsp; &nbsp; Aralon - - 3,500 credits<br/>&nbsp; &nbsp; Magacek - - 4,000 credits<br/>&nbsp; &nbsp; Halfway - - 6,000 credits"
+        }
+      ],
+      "exits": [
+        {
+          "name": "east",
+          "alias": ["port", "space port"],
+          "location": "space-port"
+        }
+      ]
+    },
+
+    // ------------------------------------------------------------------------
+    // Location: Money Exchange
+    // ------------------------------------------------------------------------
+    {
+      "id": "money-exchange",
+      "name": "Money Exchange",
+      "descr": "Passengers who are leaving Grason can trade their Grayson Credits for Stellars here.",
+      "exits": [
+        {
+          "name": "west",
+          "alias": ["sppace port", "port"],
+          "location": "space-port"
+        }
+      ]
+    }
+  ]
+}
