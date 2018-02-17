@@ -1,0 +1,44 @@
+The year is 3012 UST (Universal Stellar Time). Ever since faster than light
+travel was discovered in 2415, humanity has been expanding to the stars. By
+now, thousands of planets have been colonized.
+
+Hank is a college dropout. At age 22, he decided he’d rather see the galaxy
+than study. He scraped together enough money for a one-way ticket to some
+random planet, packed his backpack, and headed out. The planet he ended up at
+is called Grayson and is far away from most regular interstellar shipping
+lines. His ticket included a complementary three-night stay at the Grayson
+Hilton. Hank has been exploring Grayson City for the past three days. Now
+he wakes up on the morning of the fourth day.
+
+It is clearly time someone with a better sense of responsibility takes
+control of Hank&rsquo;s life.
+
+About the Game
+
+The game is a text adventure, meaning the player interacts with the game by
+typing commands into a text box; the game responds with one or more lines of
+text. Part of the fun is discovering the commands as you go along. Carefully
+read the text as it contains clues as to what is possible.
+
+Most commands start with an action (verb) and are often followed by a noun
+indicating what to apply the action to. A few examples:
+
+look: looks around and describes where you are.<br/>
+look object: looks at the object and describes it.<br/>
+take object: pick up the object.<br/>
+drop object: drop the previously picked up object.<br/>
+inventory lists the things you are carrying with you.
+
+Moving around is mostly done by go and a direction:<br/>
+go east<br/>
+go north
+
+Some special commands are:<br/>
+save filename: save the current state of the game in the file filename.<br/>
+load filename: load the previously saved state of the game from filename.
+
+Hints
+
+The game has a limited vocabulary, and finding the right terms can be
+tricky. Try the command hint to get ideas. Usually the hints are pretty
+generic, but depending on where you are the game can give more specific hints.

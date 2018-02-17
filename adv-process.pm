@@ -215,7 +215,24 @@ sub process_command {
   }
 }
 
+sub display_splash {
+  open(FILE, "<splash.txt") || return;
+  my $data = "";
+  while (<FILE>) {
+    chomp();
+    s/\r//;
+    $data .= $_ . "\n";
+  }
+  close FILE;
+
+  $data =~ s/\n\n/<br\/><br\/>/g;
+  $data =~ s/\n/ /g;
+  out($data);
+}
+
 sub process {
+  display_splash();
+
   my $loc = get_location();
   describe_location($loc);
 
