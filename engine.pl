@@ -18,6 +18,8 @@ sub out {
 
   # Handle textual output
   $msg =~ s/&rsquo;/\'/g;
+  $msg =~ s/&ldquo;/\"/g;
+  $msg =~ s/&rdquo;/\"/g;
   $msg =~ s/&nbsp;/ /g;
   $msg =~ s/<br\/>/\n/g;
   $msg =~ s/<\/?strong>//g;

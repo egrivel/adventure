@@ -143,6 +143,16 @@
         {
           "name": "north",
           "location": "street-2"
+        },
+        {
+          "name": "south",
+          "alias": ["space port"],
+          "location": "space-port"
+        },
+        {
+          "name": "east",
+          "alias": ["hostel"],
+          "location": "hostel"
         }
       ]
     },
@@ -162,6 +172,11 @@
         {
           "name": "south",
           "location": "street-1"
+        },
+        {
+          "name": "east",
+          "alias": ["cafetaria"],
+          "location": "cafetaria"
         }
       ]
     },
@@ -213,6 +228,10 @@
         {
           "name": "south",
           "location": "street-3"
+        },
+        {
+          "name": "north",
+          "location": "street-5"
         },
         {
           "name": "west",
@@ -267,7 +286,7 @@
       "exits": [
         {
           "name": "west",
-          "alias": ["street, exit"],
+          "alias": ["street", "exit"],
           "location": "street-4"
         }
       ]
@@ -307,7 +326,7 @@
         },
         {
           "name": "north",
-          "location": "park3"
+          "location": "park-3"
         }
       ]
     },
@@ -407,12 +426,22 @@
     {
       "id": "space-port",
       "name": "Space Port",
-      "descr": "Main entrance to the space port. There is a ticketing office to the west, a money exchange office to the east, and a gate to the terminals to the south. Exit to the street is to the north.",
+      "descr": "Main entrance to the space port. There is a ticket office to the west, a money exchange office to the east, and a gate to the terminals to the south. Exit to the street is to the north.",
       "exits": [
         {
           "name": "north",
           "alias": ["street"],
           "location": "street-1"
+        },
+        {
+          "name": "west",
+          "alias": ["ticket office", "ticketing", "office"],
+          "location": "ticket-office"
+        },
+        {
+          "name": "east",
+          "alias": ["money exchange", "exchange"],
+          "location": "money-exchange"
         }
       ]
     },
@@ -422,12 +451,12 @@
     // ------------------------------------------------------------------------
     {
       "id": "ticket-office",
-      "name": "Ticketing Office",
+      "name": "Ticket Office",
       "descr": "Here you buy tickets for flights to different places on and off the planet. The young lady behind the counter is waiting for customers. There is a pricelist on the counter.",
       "items": [
         {
           "name": "pricelist",
-          "descr": "<strong>Domestic shuttles:</strong><br/>&nbsp; &nbsp; Dawson - - sold out<br/>&nbsp; &nbsp; Hooch City - - 500 credits<br/>&nbsp; &nbsp; New Philly - - sold out<br/>&nbsp &nbsp; Lan-Chin - - 700 credit<br/>&nbsp; &nbsp; Phoebe - sold out<br/><br/><strong>Interstellar:</strong><br/>&nbsp; &nbsp; Aralon - - 3,500 credits<br/>&nbsp; &nbsp; Magacek - - 4,000 credits<br/>&nbsp; &nbsp; Halfway - - 6,000 credits"
+          "descr": "<strong>Domestic shuttles:</strong><br/>&nbsp; &nbsp; Dawson - - sold out<br/>&nbsp; &nbsp; Hooch City - - 500 credits<br/>&nbsp; &nbsp; New Philly - - sold out<br/>&nbsp; &nbsp; Lan-Chin - - 700 credit<br/>&nbsp; &nbsp; Phoebe - sold out<br/><br/><strong>Interstellar:</strong><br/>&nbsp; &nbsp; Aralon - - 3,500 credits<br/>&nbsp; &nbsp; Magacek - - 4,000 credits<br/>&nbsp; &nbsp; Halfway - - 6,000 credits"
         }
       ],
       "exits": [

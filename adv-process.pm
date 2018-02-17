@@ -1,4 +1,13 @@
+# 
+# Processing the input
+#
+# This file has the global input loop at the bottom, and all the functions
+# that process different commands.
+#
 
+#
+# Global environment
+#
 sub match_name {
   my $item = $_[0];
   my $name = $_[1];
