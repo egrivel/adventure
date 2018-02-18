@@ -327,4 +327,40 @@ sub set_time {
   set_global('time', $_[0]);
 }
 
+# -----------------------------------------------------------------------------
+# Loading and saving
+# -----------------------------------------------------------------------------
+
+sub save {
+  my %data = ();
+  $data{"objects"} = \%gl_objects;
+  $data{"values"} = \%gl_values;
+  $data{"current-location"} = get_current_location_id();
+
+  my $data = encode_json(\%data);
+  open(FILE, ">data/saving.dat");
+  print FILE $data;
+  close FILE;
+}
+
+sub load {
+  open(FILE, "<data/saving.dat");
+  my $data = "";
+  while (<FILE>) {
+    chomp();
+    s/\r//;
+    $data .= $_;
+  }
+  close FILE;
+
+  my $obj = decode_json($data);
+  my $key;
+  foreach $key (keys $$obj{"objects"}) {
+    $gl_objects{$key} = $$obj{"objects"}{$key};
+  }
+  foreach $key (keys $$obj{"values"}) {
+    $gl_values{$key} = $$obj{"values"}{$key};
+  }
+  set_current_location_id($$obj{"current-location"});
+}
 return 1;

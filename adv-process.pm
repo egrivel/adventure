@@ -191,7 +191,7 @@ sub process_action {
     }
   }
 
-  my $item = get_object($noun);
+  $item = get_object($noun);
   if (defined($object)) {
     if (defined($$object{"actions"}{$verb})) {
       my $cmd = "my \$noun = '$noun'; " . $$object{"actions"}{$verb};
@@ -231,6 +231,10 @@ sub process_command {
     my $time = get_time();
     $time += 60 * $noun;
     set_time($time);
+  } elsif ($verb eq "save") {
+    save();
+  } elsif ($verb eq "load") {
+    load();
   } elsif (process_action($verb, $noun)) {
     # already processed
   } else {
