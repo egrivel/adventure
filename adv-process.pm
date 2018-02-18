@@ -166,7 +166,7 @@ sub process_inventory {
 
 # Display the current time
 sub process_time {
-  my $sec = $gl_time + (8 * 60 * 60);
+  my $sec = get_time() + (8 * 60 * 60);
 
   my $min = int($sec / 60);
   $sec -= 60 * $min;
@@ -229,7 +229,9 @@ sub process_command {
   } elsif ($verb eq "time") {
     process_time($noun);
   } elsif ($verb eq "wait") {
-    $gl_time += 60 * $noun;
+    my $time = get_time();
+    $time += 60 * $noun;
+    set_time($time);
   } elsif (process_action($verb, $noun)) {
     # already processed
   } else {
@@ -258,7 +260,7 @@ sub process {
   my $loc = get_location();
   describe_location($loc);
 
-  $gl_time = 0;
+  set_time(0);
 
   while (<>) {
     chomp();
@@ -276,7 +278,9 @@ sub process {
 
     # A clock tick of about 5 minutes
     process_action("tick", "");
-    $gl_time += 260 + int(rand(80));
+    my $time = get_time();
+    $time += 260 + int(rand(80));
+    set_time($time);
   }
 }
 

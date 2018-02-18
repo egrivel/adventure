@@ -1,5 +1,15 @@
+# $gl_data is a reference to the static data loaded from the configuration file
 my $gl_data = "";
-my @gl_inventory;
+
+# %gl_values are the global values (which can be changing)
+my %gl_values = ();
+
+# @gl_inventory is the items being carried
+my @gl_inventory = ();
+
+# $gl_location is the current location
+my $gl_location = "";
+
 
 sub read_data {
   my $fname = $_[0];
@@ -19,8 +29,7 @@ sub read_data {
 
   $gl_data = decode_json($data);
 
-  $default_location = $$gl_data{"default-location"};
-  $gl_location = find_location($default_location);
+  $gl_location = find_location($$gl_data{"default-location"});
 }
 
 sub find_location {
@@ -136,6 +145,25 @@ sub move_item {
       }
     }
   }
+}
+
+sub set_global {
+  $gl_values{$_[0]} = $_[1];
+}
+
+sub get_global {
+  if (defined($gl_values{$_[0]})) {
+    return $gl_values{$_[0]};
+  }
+  return "";
+}
+
+sub get_time {
+  return get_global('time');
+}
+
+sub set_time {
+  set_global('time', $_[0]);
 }
 
 return 1;
