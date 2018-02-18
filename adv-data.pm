@@ -27,7 +27,7 @@ sub find_location {
   my $id = $_[0];
   for ($i = 0; defined($$gl_data{"locations"}[$i]); $i++) {
     if ($$gl_data{"locations"}[$i]{"id"} eq $id) {
-      return $$gl_data{"locations"}[$i];;
+      return $$gl_data{"locations"}[$i];
     }
   }
   return undef;
@@ -67,6 +67,45 @@ sub get_nr_inventory {
 sub get_inventory {
   my $nr = $_[0];
   return $gl_inventory[$nr];
+}
+
+sub find_item {
+  my $item_name = $_[0];
+
+  my $i;
+  my $item;
+  for ($i = 0; defined($gl_inventory[$i]); $i++) {
+    $item = $gl_inventory[$i];
+    if ($$item{"name"} eq $item_name) {
+      return $item;
+    }
+  }
+
+  if (defined($gl_location)) {
+    for ($i = 0; defined($$gl_location{"items"}[$i]); $i++) {
+      $item = $$gl_location{"items"}[$i];
+      if ($$item{"name"} eq $item_name) {
+        return $item;
+      }
+    }
+  }
+  return undef;
+}
+
+sub get_item_descr {
+  my $loc_id = $_[0];
+  my $item_name = $_[1];
+
+  my $item = find_item($item_name);
+  if (defined($item)) {
+    if (defined($$item{"get-descr"})) {
+      my $value = eval($$item{"get-descr"});
+      return $value;
+    }
+    return $$item{"descr"};
+  }  
+
+  return "I don&rsquo;t know about $item_name";
 }
 
 return 1;

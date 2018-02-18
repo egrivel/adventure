@@ -52,6 +52,13 @@
           "name": "sketchbook",
           "descr": "An empty sketchbook. It may be fun to make drawings of interesting things you see.",
           "sdescr": "a sketchbook"
+        },
+        {
+          "type": "portable",
+          "name": "wallet",
+          "descr": "A wallet containing 300 Grayson credits.",
+          "amount": 250,
+          "get-descr": "my $wallet = find_item('wallet'); my $amount = 'no'; if (defined($wallet)) { $amount = $$wallet{'amount'}; } return 'A wallet containing ' . $amount . ' Grayson credits.';"
         }
       ],
       "exits": [
@@ -97,6 +104,7 @@
       "id": "lobby",
       "name": "Lobby",
       "descr": "Lobby of the Grayson Hilton. The lobby looks impressive, with gold-colored trim around wood-colored panels but you are pretty sure it is all fake. The carpet is worn and the plants are plastic. This place has definitely seen better days!<br/>There is a front desk and a hallway to the north. On the west side are revolving doors leading out.",
+      "action-pay": "my $wallet = find_item('wallet'); my $amount = 'no'; if (defined($wallet)) { $amount = $$wallet{'amount'}; } if ($noun eq '' || $noun eq 'bill') {if ($amount ne 'no' && $amount > 100) { $amount -= 100; $$wallet{'amount'} = $amount; out('bill has been paid'); } else { out('You don&rsquo;t have enough money to pay your bill'); }} else {out('I don&rsquo;t know how to pay ' . $noun);}",
       "items": [
         {
           "name": "desk",

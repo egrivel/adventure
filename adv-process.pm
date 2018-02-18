@@ -56,16 +56,7 @@ sub process_look {
   if ($noun eq "") {
     describe_location($loc);
   } else {
-    my $i;
-    for ($i = 0; defined($$loc{"items"}[$i]); $i++) {
-      if (match_name($$loc{"items"}[$i], $noun)) {
-        out($$loc{"items"}[$i]{"descr"});
-        last;
-      }
-    }
-    if (!defined($$loc{"items"}[$i])) {
-      out("I don&rsquo;t know about $noun");
-    }
+    out(get_item_descr($$loc{"id"}, $noun));
   }
 }
 
@@ -162,7 +153,7 @@ sub process_inventory {
     if ($list ne "") {
       $list .= " ";
     }
-    $list .= $$item{"descr"};
+    $list .= $$item{"name"};
   }
   if ($list eq "") {
     out("Your are not carrying anything.");
@@ -184,6 +175,19 @@ sub process_time {
   $min = '0' . $min if ($min < 10);
 
   out("$hr:$min:$sec GST");
+}
+
+sub process_action {
+  my $verb = $_[0];
+  my $noun = $_[1];
+
+  my $loc = get_location();
+  if (defined($$loc{"action-$verb"})) {
+    my $cmd = "my \$noun = '$noun'; " . $$loc{"action-$verb"};
+    eval $cmd;
+    return $1;
+  }
+  return 0;
 }
 
 sub process_command {
@@ -210,6 +214,8 @@ sub process_command {
     process_inventory($noun);
   } elsif ($verb eq "time") {
     process_time($noun);
+  } elsif (process_action($verb, $noun)) {
+    # already processed
   } else {
     out("Sorry, I don't understand $verb");
   }
