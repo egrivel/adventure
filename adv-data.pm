@@ -108,4 +108,34 @@ sub get_item_descr {
   return "I don&rsquo;t know about $item_name";
 }
 
+sub move_item {
+  my $item_name = $_[0];
+  my $from_loc = $_[1];
+  my $to_loc = $_[2];
+
+  my $from = find_location($from_loc);
+  my $to = find_location($to_loc);
+  if (!defined($from) || !defined($to)) {
+    print "Cannot find $from_loc or $to_loc\n";
+    return;
+  }
+
+  if (defined($$from{"items"})) {
+    my $i;
+    for ($i = 0; defined($$from{"items"}[$i]); $i++) {
+      my $item = $$from{"items"}[$i];
+      if ($$item{"name"} eq $item_name) {
+        splice($$from{"items"}, $i, 1);
+        if (!defined($$to{"items"})) {
+          $$to{"items"} = [];
+          $$to{"items"}[0] = $item;
+        } else {
+          push($$to{"items"}, $item);
+        }
+        return;
+      }
+    }
+  }
+}
+
 return 1;

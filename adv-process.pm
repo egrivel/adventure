@@ -74,8 +74,10 @@ sub process_go {
   my $i;
   for ($i = 0; defined($$loc{"exits"}[$i]); $i++) {
     if (match_name($$loc{"exits"}[$i], $direction)) {
+      process_action("leave", "");
       set_location($$loc{"exits"}[$i]{"location"});
-      do_action(get_location());
+      process_action("enter", "");
+      # do_action(get_location());
       describe_location(get_location());
       return;
     }
@@ -182,11 +184,23 @@ sub process_action {
   my $noun = $_[1];
 
   my $loc = get_location();
-  if (defined($$loc{"action-$verb"})) {
-    my $cmd = "my \$noun = '$noun'; " . $$loc{"action-$verb"};
-    eval $cmd;
-    return $1;
+  if (defined($$loc{"actions"})) {
+    if (defined($$loc{"actions"}{$verb})) {
+      my $cmd = "my \$noun = '$noun'; " . $$loc{"actions"}{$verb};
+      eval $cmd;
+      return $1;
+    }
   }
+
+  my $item = find_item($noun);
+  if (defined($item)) {
+    if (defined($$item{"actions"}{$verb})) {
+      my $cmd = "my \$noun = '$noun'; " . $$item{"actions"}{$verb};
+      eval $cmd;
+      return $1;
+    }
+  }
+
   return 0;
 }
 
@@ -214,6 +228,8 @@ sub process_command {
     process_inventory($noun);
   } elsif ($verb eq "time") {
     process_time($noun);
+  } elsif ($verb eq "wait") {
+    $gl_time += 60 * $noun;
   } elsif (process_action($verb, $noun)) {
     # already processed
   } else {
@@ -257,8 +273,10 @@ sub process {
     } elsif (/\S/) {
       out("Sorry, could you rephrase that?")
     }
-    $gl_time += 260 + int(rand(80));
 
+    # A clock tick of about 5 minutes
+    process_action("tick", "");
+    $gl_time += 260 + int(rand(80));
   }
 }
 

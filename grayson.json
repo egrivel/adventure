@@ -13,7 +13,10 @@
       "id": "hotel-room",
       "name": "Hotel room",
       "descr": "You are in a hotel room. It looks pretty much like any other hotel room you have ever seen. There is a bed, a night stand with a note card, a window, a bathroom, and a door to the west.",
-      "action": "if ($gl_time > 3*60*60) { out('You cannot return into the room'); set_location('hallway'); }",
+      "actions": {
+        "enter": "if ($gl_time > 3*60*60) { out('You cannot return into the room'); set_location('hallway'); }",
+        "tick": "if ($gl_time > 3*60*60) { move_item('backpack', 'hotel-room', 'hallway'); move_item('sketchbook', 'hotel-room', 'hallway'); move_item('wallet', 'hotel-room', 'hallway'); set_location('hallway'); out('The maid enters the room and reminds you it is past checkout time. She puts you and all your stuff in the hallway and locks the door behind you.'); process_look('');}"
+      },
       "items": [
         {
           "name": "bed",
@@ -21,16 +24,12 @@
         },
         {
           "name": "night stand",
-          "alias": [
-            "stand"
-          ],
+          "alias": ["stand"],
           "descr": "There is a note card on the night stand."
         },
         {
           "name": "note card",
-          "alias": [
-            "note", "card"
-          ],
+          "alias": ["note", "card"],
           "descr": "The note card reads:<br/>&nbsp;&nbsp;<strong>Grayson Hilton</strong><br/>&nbsp;&nbsp;Grayson City<br/>&nbsp;&nbsp;Check-out time: 11:00."
         },
         {
@@ -104,14 +103,19 @@
       "id": "lobby",
       "name": "Lobby",
       "descr": "Lobby of the Grayson Hilton. The lobby looks impressive, with gold-colored trim around wood-colored panels but you are pretty sure it is all fake. The carpet is worn and the plants are plastic. This place has definitely seen better days!<br/>There is a front desk and a hallway to the north. On the west side are revolving doors leading out.",
-      "action-pay": "my $wallet = find_item('wallet'); my $amount = 'no'; if (defined($wallet)) { $amount = $$wallet{'amount'}; } if ($noun eq '' || $noun eq 'bill') {if ($amount ne 'no' && $amount > 100) { $amount -= 100; $$wallet{'amount'} = $amount; out('bill has been paid'); } else { out('You don&rsquo;t have enough money to pay your bill'); }} else {out('I don&rsquo;t know how to pay ' . $noun);}",
+      "actions": {
+        "pay": "out('You don&rsquo;t have to pay, your stay in the hotel was free with the ticket.');"
+      },
       "items": [
         {
           "name": "desk",
           "alias": [
             "front desk"
           ],
-          "descr": "The front desk looks deserted right now. You don&rsquo;t see any way to get anyone&rsquo;s attention."
+          "descr": "The front desk looks deserted right now. You don&rsquo;t see any way to get anyone&rsquo;s attention.",
+          "actions": {
+            "pick": "out('You have successfully picked the desk');"
+          }
         },
         {
           "name": "carpet",
