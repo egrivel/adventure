@@ -5,6 +5,26 @@
   "id": "grayson",
   "name": "Grayson",
   "default-location": "hotel-room",
+  "objects": [
+    {
+      "id": "backpack",
+      "descr": "A medium-sized backpack.",
+      "sdescr": "a backpack",
+      "default-location": "hotel-room"
+    },
+    {
+      "id": "sketchbook",
+      "descr": "An empty sketchbook. It may be fun to make drawings of interesting things you see.",
+      "sdescr": "a sketchbook",
+      "default-location": "hotel-room"
+    },
+    {
+      "id": "wallet",
+      "sdescr": "a wallet",
+      "get-descr": "my $amount = get_global('wallet-amount'); if ($amount eq '') {$amount = 100; set_global('wallet-amount', $amount);}  return 'A wallet containing ' . $amount . ' Grayson credits.';",
+      "default-location": "hotel-room"
+    }
+  ],
   "locations": [
     // ------------------------------------------------------------------------
     // Location: Hotel Room
@@ -39,23 +59,6 @@
         {
           "name": "bathroom",
           "descr": "You look into the bathroom but don&rsquo;t see anything out of the ordinary.<br/>While you&rsquo;re there anyway, you make use of the facilities.<br/><br/>Aaagh, that feels better!"
-        },
-        {
-          "type": "portable",
-          "name": "backpack",
-          "descr": "A medium-sized backpack.",
-          "sdescr": "a backpack"
-        },
-        {
-          "type": "portable",
-          "name": "sketchbook",
-          "descr": "An empty sketchbook. It may be fun to make drawings of interesting things you see.",
-          "sdescr": "a sketchbook"
-        },
-        {
-          "type": "portable",
-          "name": "wallet",
-          "get-descr": "my $amount = get_global('wallet-amount'); if ($amount eq '') {$amount = 100; set_global('wallet-amount', $amount);}  return 'A wallet containing ' . $amount . ' Grayson credits.';"
         }
       ],
       "exits": [

@@ -10,7 +10,17 @@ my @gl_inventory = ();
 # $gl_location is the current location
 my $gl_location = "";
 
+# %gl_objects is the list of objects with their current location and
+# state
+my %gl_objects = ();
 
+# Declare special location ID for the 'inventory' location of objects (the
+# objects being carried around).
+$INVENTORY = '@inventory';
+
+# -----------------------------------------------------------------------------
+# Read the source data file.
+# -----------------------------------------------------------------------------
 sub read_data {
   my $fname = $_[0];
 
@@ -29,34 +39,228 @@ sub read_data {
 
   $gl_data = decode_json($data);
 
-  $gl_location = find_location($$gl_data{"default-location"});
+  $gl_location = get_location($$gl_data{"default-location"});
+
+  # Put all objects in their default location
+  my $i;
+  for ($i = 0; defined($$gl_data{"objects"}[$i]); $i++) {
+    my $id = $$gl_data{"objects"}[$i]{"id"};
+    my $location = $$gl_data{"objects"}[$i]{"default-location"};
+    move_object($id, $location);
+  }
 }
 
-sub find_location {
+# -----------------------------------------------------------------------------
+# Location functions
+# Locations are all in the source data, and don't change. The location
+# functions operate on the source data tree.
+# 
+# Functions are:
+#  - get_location($location_id) returns the location object, or undef
+#  - get_current_location() returns the current location object
+#  - get_current_location_id() returns the current location ID
+#  - set_current_location($location) sets the current location to the object
+#  - set_current_location_id($id) sets the current location to the ID
+# -----------------------------------------------------------------------------
+
+sub get_location {
   my $id = $_[0];
+
   for ($i = 0; defined($$gl_data{"locations"}[$i]); $i++) {
     if ($$gl_data{"locations"}[$i]{"id"} eq $id) {
       return $$gl_data{"locations"}[$i];
     }
   }
+
+  print "Location $id not found\n";
   return undef;
 }
 
-sub get_location {
-   return $gl_location;
+sub get_current_location {
+  return $gl_location;
 }
 
-sub set_location {
+sub get_current_location_id {
+  return $$gl_location{"id"};
+}
+
+sub set_current_location {
+  $gl_location = $_[0];
+}
+
+sub set_current_location_id {
   my $id = $_[0];
 
   if (defined($id)) {
-    my $loc = find_location($id);
+    my $loc = get_location($id);
     if (defined($loc)) {
       $gl_location = $loc;
     }
   }
 }
 
+# -----------------------------------------------------------------------------
+# Item and Object functions
+#
+# Items are static to a particular location. Objects can be moved from
+# location to location, or can be carried around (put in the inventory).
+#
+#  - get_item($item_id) returns the item object for the given ID; the item
+#    has to be in the current location
+#  - get_item_elsewhere($location_id, $item_id) returns the item object for
+#    the item in the specified other location.
+#  - get_item_list() returns an array of item IDs in the current location.
+#  - get_item_list_elsewhere($location_id) returns the array of items in
+#    a different location
+#
+#  - get_object($object_id) returns the object object for the given ID if it
+#    is in the current location or inventory, or undef otherwise.
+#  - get_object_elsewhere($object_id) returns the object object regardless
+#    of where the object is.
+#  - get_object_list() returns an array of object IDs currently accessible
+#    (in the current location, or in the inventory).
+#  - get_object_location($object_id) returns the location ID for the object.
+#  - move_object($object_id, $to_location_id) move object to location.
+# -----------------------------------------------------------------------------
+
+sub get_item {
+  my $item_id = $_[0];
+
+  return get_item_elsewhere(get_current_location_id(), $item_id);
+}
+
+sub get_item_elsewhere {
+  my $location_id = $_[0];
+  my $item_id = $_[1];
+
+  my $loc = get_location($location_id);
+  # The location doesn't exist, so no item
+  return undef if (!defined($loc));
+
+  # The location doesn't have items, so no item
+  return undef if (!defined($$loc{"items"}));
+
+  my $i;
+  for ($i = 0; defined($$loc{"items"}[$i]); $i++) {
+    if ($$loc{"items"}[$i]{"name"} eq $item_id) {
+      # found it
+      return $$loc{"items"}[$i];
+    }
+  }
+
+  # not found
+  return undef;
+}
+
+sub get_item_list {
+  return get_item_list_elsewhere(get_current_location_id());
+}
+
+sub get_item_list_elsewhere {
+  my $location_id = $_[0];
+  my @list = ();
+
+  my $loc = get_location($location_id);
+  # The location doesn't exist, so no item
+  return @list if (!defined($loc));
+
+  # The location doesn't have items, so no item
+  return @list if (!defined($$loc{"items"}));
+
+  my $i;
+  for ($i = 0; defined($$loc{"items"}[$i]); $i++) {
+    $list[$i] = $$loc{"items"}[$i]{"name"};
+  }
+
+  return @list;
+}
+
+# Return the object object if it is visible
+sub get_object {
+  my $object_id = $_[0];
+
+  if (!defined($gl_objects{$object_id})) {
+    # object doesn't exist
+    return undef;
+  }
+
+  my $object_loc = $gl_objects{$object_id}{"location"};
+  if (!defined($object_loc)) {
+    # object has no location
+    return undef;
+  }
+
+  my $loc_id = get_current_location_id();
+  if ($object_loc ne $loc_id && $object_loc ne $INVENTORY) {
+    # object neither in current location not in inventory
+    return undef;
+  }
+
+  return get_object_elsewhere($object_id);
+}
+
+# Return the object object whereever it is located.
+sub get_object_elsewhere {
+  my $object_id = $_[0];
+
+  if (defined($$gl_data{"objects"})) {
+    my $i;
+    for ($i = 0; defined($$gl_data{"objects"}[$i]); $i++) {
+      if ($$gl_data{"objects"}[$i]{"id"} eq $object_id) {
+        return $$gl_data{"objects"}[$i];
+      }
+    }
+  }
+
+  return undef;
+}
+
+sub get_object_list {
+
+}
+sub get_object_location {
+  my $object_id = $_[0];
+
+  if (defined($gl_objects{$object_id})) {
+    return $gl_objects{$object_id}{"location"};
+  }
+
+  return undef;
+}
+
+sub move_object {
+  my $object_id = $_[0];
+  my $location_id = $_[1];
+
+  if (!defined($gl_objects{$object_id})) {
+    my %empty = ();
+    $gl_objects{$object_id} = %empty;
+  }
+
+  $gl_objects{$object_id}{"location"} = $location_id;
+}
+
+#
+# legacy object functions
+#
+sub list_objects_in_location {
+  my $location_id = $_[0];
+
+  my $list = "";
+  my $key;
+  foreach $key (keys %gl_objects) {
+    if ($gl_objects{$key}{"location"} eq $location_id) {
+      $list .= ", " if ($list ne "");
+      my $obj = get_object($key);
+      $list .= $$obj{"sdescr"};
+    }
+  }
+
+  $list =~ s/,([^,]+)$/ and$1/;
+  return $list;
+}
+
+# legacy inventory functions
 sub add_inventory {
   my $item = $_[0];
 
@@ -122,8 +326,8 @@ sub move_item {
   my $from_loc = $_[1];
   my $to_loc = $_[2];
 
-  my $from = find_location($from_loc);
-  my $to = find_location($to_loc);
+  my $from = get_location($from_loc);
+  my $to = get_location($to_loc);
   if (!defined($from) || !defined($to)) {
     print "Cannot find $from_loc or $to_loc\n";
     return;

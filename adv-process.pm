@@ -28,22 +28,12 @@ sub match_name {
 
 sub describe_location {
   my $loc = $_[0];
+  my $loc_id = $$loc{"id"};
 
   my $out = $$loc{"descr"};
+  my $list = list_objects_in_location($loc_id);
 
-  my $i;
-  my $list = "";
-  for ($i = 0; defined($$loc{"items"}[$i]); $i++) {
-    my $item = $$loc{"items"}[$i];
-    if (is_portable($item)) {
-      if ($list ne "") {
-        $list .= ", ";
-      }
-      $list .= "a " . $$item{"name"};
-    }
-  }
   if ($list ne "") {
-    $list =~ s/,([^,]+)$/ and$1/;
     $out .= "\nYou can see $list.";
   }
   out($out);
@@ -51,7 +41,7 @@ sub describe_location {
 
 sub process_look {
   my $noun = $_[0];
-  my $loc = get_location();
+  my $loc = get_current_location();
 
   if ($noun eq "") {
     describe_location($loc);
@@ -69,16 +59,16 @@ sub do_action {
 
 sub process_go {
   my $direction = $_[0];
-  my $loc = get_location();
+  my $loc = get_current_location();
 
   my $i;
   for ($i = 0; defined($$loc{"exits"}[$i]); $i++) {
     if (match_name($$loc{"exits"}[$i], $direction)) {
       process_action("leave", "");
-      set_location($$loc{"exits"}[$i]{"location"});
+      set_current_location_id($$loc{"exits"}[$i]{"location"});
       process_action("enter", "");
-      # do_action(get_location());
-      describe_location(get_location());
+      # do_action(get_current_location());
+      describe_location(get_current_location());
       return;
     }
   }
@@ -97,7 +87,7 @@ sub is_portable {
 
 sub process_get {
   my $noun = $_[0];
-  my $loc = get_location();
+  my $loc = get_current_location();
 
   my $i;
   for ($i = 0; defined($$loc{"items"}[$i]); $i++) {
@@ -119,7 +109,7 @@ sub process_get {
 
 sub process_drop {
   my $noun = $_[0];
-  my $loc = get_location();
+  my $loc = get_current_location();
 
   my $nr = get_nr_inventory();
   my $i;
@@ -183,7 +173,7 @@ sub process_action {
   my $verb = $_[0];
   my $noun = $_[1];
 
-  my $loc = get_location();
+  my $loc = get_current_location();
   if (defined($$loc{"actions"})) {
     if (defined($$loc{"actions"}{$verb})) {
       my $cmd = "my \$noun = '$noun'; " . $$loc{"actions"}{$verb};
@@ -255,9 +245,9 @@ sub display_splash {
 }
 
 sub process {
-  display_splash();
+  # display_splash();
 
-  my $loc = get_location();
+  my $loc = get_current_location();
   describe_location($loc);
 
   set_time(0);
