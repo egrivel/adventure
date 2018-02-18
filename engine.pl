@@ -6,7 +6,7 @@ use JSON;
 require("adv-data.pm");
 require("adv-process.pm");
 
-read_data("grayson.json");
+read_data("grayson.jsonc");
 process();
 
 # -----------------------------------------------------------------------------
