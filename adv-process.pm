@@ -155,7 +155,7 @@ sub process_inventory {
 }
 
 # Display the current time
-sub process_time {
+sub display_time {
   my $sec = get_time() + (8 * 60 * 60);
 
   my $min = int($sec / 60);
@@ -166,7 +166,11 @@ sub process_time {
   $min -= 60 * $hr;
   $min = '0' . $min if ($min < 10);
 
-  out("$hr:$min:$sec GST");
+  return "$hr:$min:$sec GST";
+}
+
+sub process_time {
+  out(display_time());
 }
 
 sub process_action {
@@ -235,6 +239,7 @@ sub process_command {
     save();
   } elsif ($verb eq "load") {
     load();
+    describe_location(get_current_location_id());
   } elsif (process_action($verb, $noun)) {
     # already processed
   } else {
@@ -257,6 +262,14 @@ sub display_splash {
   out($data);
 }
 
+sub header {
+  my $time = display_time();
+  my $loc = get_location(get_current_location_id());
+
+  my $out = "[" . $time . "] " . $$loc{"name"};
+  out($out, 0);
+}
+
 sub process {
   # display_splash();
 
@@ -264,6 +277,7 @@ sub process {
 
   set_time(0);
 
+  header();
   while (<>) {
     chomp();
     s/\r//;
@@ -283,6 +297,8 @@ sub process {
     my $time = get_time();
     $time += 260 + int(rand(80));
     set_time($time);
+
+    header();
   }
 }
 

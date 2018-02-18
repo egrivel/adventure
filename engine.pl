@@ -15,6 +15,10 @@ process();
 
 sub out {
   my $msg = $_[0];
+  my $extra_line = $_[1];
+  if (!defined($extra_line)) {
+    $extra_line = 1;
+  }
 
   # Handle textual output
   $msg =~ s/&rsquo;/\'/g;
@@ -37,7 +41,7 @@ sub out {
     print " > " . $msg[$i] . "\n";
   }
 
-  print "\n";
+  print "\n" if ($extra_line);
 }
 
 sub error {

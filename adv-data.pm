@@ -338,13 +338,49 @@ sub save {
   $data{"current-location"} = get_current_location_id();
 
   my $data = encode_json(\%data);
-  open(FILE, ">data/saving.dat");
+
+  opendir(DIR, "data") || die "Cannot scan directory data\n";
+  my $fname;
+  my $last = 0;
+  while (defined($fname = readdir(DIR))) {
+    next if ($fname =~ /^\./);
+    next if (-d "data/$fname");
+    if ($fname =~ /^data(\d+)\.dat$/) {
+      my $nr = $1;
+      if ($nr > $last) {
+        $last = $nr;
+      }
+    }
+  }
+  closedir(DIR);
+  $last++;
+  while (length($last) < 4) {
+    $last = '0' . $last;
+  }
+
+  open(FILE, ">data/data$last.dat");
   print FILE $data;
   close FILE;
+
+  out("Saved as data$last.dat");
 }
 
 sub load {
-  open(FILE, "<data/saving.dat");
+  my $fname;
+  my $last = 0;
+  opendir(DIR, "data") || die "Cannot scan directory data\n";
+  while (defined($fname = readdir(DIR))) {
+    next if ($fname =~ /^\./);
+    next if (-d "data/$fname");
+    if ($fname =~ /^data(\d+)\.dat$/) {
+      my $nr = $1;
+      if ($nr > $last) {
+        $last = $nr;
+      }
+    }
+  }
+  closedir(DIR);
+  open(FILE, "<data/data$last.dat");
   my $data = "";
   while (<FILE>) {
     chomp();
