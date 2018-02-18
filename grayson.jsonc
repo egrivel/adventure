@@ -34,8 +34,8 @@
       "name": "Hotel room",
       "descr": "You are in a hotel room. It looks pretty much like any other hotel room you have ever seen. There is a bed, a night stand with a note card, a window, a bathroom, and a door to the west.",
       "actions": {
-        "enter": "if (get_time() > 3*60*60) { out('You cannot return into the room'); set_location('hallway'); }",
-        "tick": "if (get_time() > 3*60*60) { move_item('backpack', 'hotel-room', 'hallway'); move_item('sketchbook', 'hotel-room', 'hallway'); move_item('wallet', 'hotel-room', 'hallway'); set_location('hallway'); out('The maid enters the room and reminds you it is past checkout time. She puts you and all your stuff in the hallway and locks the door behind you.'); process_look('');}"
+        "enter": "if (get_time() > 3*60*60) { out('You cannot return into the room'); set_current_location_id('hallway'); }",
+        "tick": "if (get_time() > 3*60*60) { move_object('backpack', 'hallway'); move_object('sketchbook', 'hallway'); move_object('wallet', 'hallway'); set_current_location_id('hallway'); out('The maid enters the room and reminds you it is past checkout time. She puts you and all your stuff in the hallway and locks the door behind you.'); process_look('');}"
       },
       "items": [
         {

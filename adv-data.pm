@@ -111,7 +111,9 @@ sub set_current_location_id {
 #    the item in the specified other location.
 #  - get_item_list() returns an array of item IDs in the current location.
 #  - get_item_list_elsewhere($location_id) returns the array of items in
-#    a different location
+#    a different location.
+#  - get_item_descr($location_id, $item_id) returns the description of the
+#    item.
 #
 #  - get_object($object_id) returns the object object for the given ID if it
 #    is in the current location or inventory, or undef otherwise.
@@ -120,7 +122,10 @@ sub set_current_location_id {
 #  - get_object_list() returns an array of object IDs currently accessible
 #    (in the current location, or in the inventory).
 #  - get_object_location($object_id) returns the location ID for the object.
+#  - get_object_descr($object_id) returns the description for the object.
 #  - move_object($object_id, $to_location_id) move object to location.
+#  - list_objects_in_location($location_id) returns a string describing the
+#    objects in the specified location.
 # -----------------------------------------------------------------------------
 
 sub get_item {
@@ -162,17 +167,33 @@ sub get_item_list_elsewhere {
 
   my $loc = get_location($location_id);
   # The location doesn't exist, so no item
-  return @list if (!defined($loc));
+  return \@list if (!defined($loc));
 
   # The location doesn't have items, so no item
-  return @list if (!defined($$loc{"items"}));
+  return \@list if (!defined($$loc{"items"}));
 
   my $i;
   for ($i = 0; defined($$loc{"items"}[$i]); $i++) {
     $list[$i] = $$loc{"items"}[$i]{"name"};
   }
 
-  return @list;
+  return \@list;
+}
+
+sub get_item_descr {
+  my $loc_id = $_[0];
+  my $item_id = $_[1];
+
+  my $item = get_item($item_id);
+  if (defined($item)) {
+    if (defined($$item{"get-descr"})) {
+      my $value = eval($$item{"get-descr"});
+      return $value;
+    }
+    return $$item{"descr"};
+  }  
+
+  return "I don&rsquo;t know about $item_id.";
 }
 
 # Return the object object if it is visible
@@ -216,8 +237,19 @@ sub get_object_elsewhere {
 }
 
 sub get_object_list {
+  my @list = ();
+  my $loc_id = get_current_location_id();
 
+  my $key;
+  foreach $key (keys %gl_objects) {
+    my $loc = $gl_objects{$key}{"location"};
+    if ($loc eq $loc_id || $loc eq $INVENTORY) {
+      push(@list, $key);
+    }
+  }
+  return \@list;
 }
+
 sub get_object_location {
   my $object_id = $_[0];
 
@@ -228,21 +260,33 @@ sub get_object_location {
   return undef;
 }
 
+sub get_object_descr {
+  my $object_id = $_[0];
+
+  my $object = get_object($object_id);
+  if (defined($object)) {
+    if (defined($$object{"get-descr"})) {
+      my $value = eval($$object{"get-descr"});
+      return $value;
+    }
+    return $$object{"descr"};
+  }  
+
+  return "I don&rsquo;t know about $object_id.";
+}
+
 sub move_object {
   my $object_id = $_[0];
   my $location_id = $_[1];
 
   if (!defined($gl_objects{$object_id})) {
     my %empty = ();
-    $gl_objects{$object_id} = %empty;
+    $gl_objects{$object_id} = \%empty;
   }
 
   $gl_objects{$object_id}{"location"} = $location_id;
 }
 
-#
-# legacy object functions
-#
 sub list_objects_in_location {
   my $location_id = $_[0];
 
@@ -260,96 +304,9 @@ sub list_objects_in_location {
   return $list;
 }
 
-# legacy inventory functions
-sub add_inventory {
-  my $item = $_[0];
-
-  my $length = @gl_inventory;
-  $gl_inventory[$length] = $item;
-}
-
-sub drop_inventory {
-  my $nr = $_[0];
-  splice(@gl_inventory, $nr, 1);
-}
-
-sub get_nr_inventory {
-  return scalar @gl_inventory;
-}
-
-sub get_inventory {
-  my $nr = $_[0];
-  return $gl_inventory[$nr];
-}
-
-sub find_item {
-  my $item_name = $_[0];
-
-  my $i;
-  my $item;
-  for ($i = 0; defined($gl_inventory[$i]); $i++) {
-    $item = $gl_inventory[$i];
-    if ($$item{"name"} eq $item_name) {
-      return $item;
-    }
-  }
-
-  if (defined($gl_location)) {
-    for ($i = 0; defined($$gl_location{"items"}[$i]); $i++) {
-      $item = $$gl_location{"items"}[$i];
-      if ($$item{"name"} eq $item_name) {
-        return $item;
-      }
-    }
-  }
-  return undef;
-}
-
-sub get_item_descr {
-  my $loc_id = $_[0];
-  my $item_name = $_[1];
-
-  my $item = find_item($item_name);
-  if (defined($item)) {
-    if (defined($$item{"get-descr"})) {
-      my $value = eval($$item{"get-descr"});
-      return $value;
-    }
-    return $$item{"descr"};
-  }  
-
-  return "I don&rsquo;t know about $item_name";
-}
-
-sub move_item {
-  my $item_name = $_[0];
-  my $from_loc = $_[1];
-  my $to_loc = $_[2];
-
-  my $from = get_location($from_loc);
-  my $to = get_location($to_loc);
-  if (!defined($from) || !defined($to)) {
-    print "Cannot find $from_loc or $to_loc\n";
-    return;
-  }
-
-  if (defined($$from{"items"})) {
-    my $i;
-    for ($i = 0; defined($$from{"items"}[$i]); $i++) {
-      my $item = $$from{"items"}[$i];
-      if ($$item{"name"} eq $item_name) {
-        splice($$from{"items"}, $i, 1);
-        if (!defined($$to{"items"})) {
-          $$to{"items"} = [];
-          $$to{"items"}[0] = $item;
-        } else {
-          push($$to{"items"}, $item);
-        }
-        return;
-      }
-    }
-  }
-}
+# -----------------------------------------------------------------------------
+# Global values
+# -----------------------------------------------------------------------------
 
 sub set_global {
   $gl_values{$_[0]} = $_[1];

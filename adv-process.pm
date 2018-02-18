@@ -5,16 +5,20 @@
 # that process different commands.
 #
 
-#
-# Global environment
-#
+# Match against the ID, name or alias. The item can be anything that can
+# have and ID, name and/or alias attribute.
 sub match_name {
   my $item = $_[0];
   my $name = $_[1];
 
+  if (defined($$item{"id"}) && $$item{"id"} eq $name) {
+    return 1;
+  }
+
   if (defined($$item{"name"}) && $$item{"name"} eq $name) {
     return 1;
   }
+
   if (defined($$item{"alias"})) {
     my $i;
     for ($i = 0; defined($$item{"alias"}[$i]); $i++) {
@@ -23,13 +27,16 @@ sub match_name {
       }
     }
   }
+
   return 0;
 }
 
+# Describe a location. This gives both the location's description and all
+# the objects that are in that location.
 sub describe_location {
-  my $loc = $_[0];
-  my $loc_id = $$loc{"id"};
+  my $loc_id = $_[0];
 
+  my $loc = get_location($loc_id);
   my $out = $$loc{"descr"};
   my $list = list_objects_in_location($loc_id);
 
@@ -41,17 +48,30 @@ sub describe_location {
 
 sub process_look {
   my $noun = $_[0];
-  my $loc = get_current_location();
+  my $loc_id = get_current_location_id();
 
   if ($noun eq "") {
-    describe_location($loc);
-  } else {
-    out(get_item_descr($$loc{"id"}, $noun));
+    describe_location($loc_id);
+    return;
   }
+
+  my $item = get_item($noun);
+  if (defined($item)) {
+    out(get_item_descr($loc_id, $noun));
+    return;
+  }
+
+  my $obj = get_object($noun);
+  if (defined($obj)) {
+    out(get_object_descr($noun));
+    return;
+  }
+
+  out("I don&rsquo;t know about $noun.");
 }
 
 sub do_action {
-  my $loc = $_[0];
+  my $loc = get_location($_[0]);
   if (defined($$loc{"action"})) {
     eval($$loc{"action"});
   }
@@ -59,7 +79,7 @@ sub do_action {
 
 sub process_go {
   my $direction = $_[0];
-  my $loc = get_current_location();
+  my $loc = get_location(get_current_location_id());
 
   my $i;
   for ($i = 0; defined($$loc{"exits"}[$i]); $i++) {
@@ -67,8 +87,8 @@ sub process_go {
       process_action("leave", "");
       set_current_location_id($$loc{"exits"}[$i]{"location"});
       process_action("enter", "");
-      # do_action(get_current_location());
-      describe_location(get_current_location());
+      # do_action(get_current_location_id());
+      describe_location(get_current_location_id());
       return;
     }
   }
@@ -76,81 +96,61 @@ sub process_go {
   out ("I don&rsquo;t know where $direction is.");
 }
 
-sub is_portable {
-  my $item = $_[0];
-
-  if (!defined($$item{"type"})) {
-    return 0;
-  }
-  return ($$item{"type"} eq "portable");
-}
-
 sub process_get {
   my $noun = $_[0];
-  my $loc = get_current_location();
 
-  my $i;
-  for ($i = 0; defined($$loc{"items"}[$i]); $i++) {
-    my $item = $$loc{"items"}[$i];
-    if (match_name($item, $noun)) {
-      if (is_portable($item)) {
-        add_inventory($item);
-        splice($$loc{"items"}, $i, 1);
-        out($$item{"name"} . " has been added to your inventory.");
-      } else {
-        out("You can&rsquo;t take " . $$item{"name"});
-      }
-      return;
+  my $obj = get_object($noun);
+  if (defined($obj)) {
+    if (get_object_location($noun) eq $INVENTORY) {
+      out("You are already carrying $noun.");
+    } else {
+      # Got an object but not in inventory, so it must be in the current
+      # location
+      move_object($noun, $INVENTORY);
+      out("$noun has been added to your inventory.");
     }
+  } else {
+    out("I don&rsquo;t see any $noun.");
   }
-
-  out("I don&rsquo;t see any $noun");
 }
 
 sub process_drop {
   my $noun = $_[0];
-  my $loc = get_current_location();
 
-  my $nr = get_nr_inventory();
-  my $i;
-  for ($i = 0; $i < $nr; $i++) {
-    my $item = get_inventory($i);
-    if ($$item{"name"} eq $noun) {
-      drop_inventory($i);
-      if (!defined($$loc{"items"})) {
-        $$loc{"items"} = ();
-        $$loc{"items"}[0] = $item;
-      } else {
-        my $j;
-        for ($j = 0; defined($$loc{"items"}[$j]); $j++) {
-          # nothing
-        }
-        $$loc{"items"}[$j] = $item;
-      }
-      describe_location($loc);
-      return;
-    }
+  my $obj = get_object($noun);
+  if (!defined($obj) || get_object_location($noun) ne $INVENTORY) {
+    # the object is not part of the inventory, so you can't drop it
+    out("You are not carrying $noun.");
+    return;
   }
-  out("You are not carrying $noun.");
+
+  my $loc_id = get_current_location_id();
+  # move the object from the inventory to the current location
+  move_object($noun, $loc_id);
+  # show the current location description, which now should include the
+  # dropped object
+  describe_location($loc_id);
 }
 
 sub process_inventory {
-  my $noun = $_[0];
-
-  my $nr = get_nr_inventory();
-  my $i;
+  my $object_list = get_object_list();
   my $list = "";
-  for ($i = 0; $i < $nr; $i++) {
-    my $item = get_inventory($i);
-    if ($list ne "") {
-      $list .= " ";
+  
+  my $i;
+  for ($i = 0; defined($$object_list[$i]); $i++) {
+    my $id = $$object_list[$i];
+    if (get_object_location($id) eq $INVENTORY) {
+      if ($list ne "") {
+        $list .= " ";
+      }
+      $list .= $id;
     }
-    $list .= $$item{"name"};
   }
+
   if ($list eq "") {
     out("Your are not carrying anything.");
   } else {
-    out("You are carrying: $list");
+    out("You are carrying: $list.");
   }
 }
 
@@ -182,12 +182,21 @@ sub process_action {
     }
   }
 
-  my $item = find_item($noun);
+  my $item = get_item($noun);
   if (defined($item)) {
     if (defined($$item{"actions"}{$verb})) {
       my $cmd = "my \$noun = '$noun'; " . $$item{"actions"}{$verb};
       eval $cmd;
-      return $1;
+      return 1;
+    }
+  }
+
+  my $item = get_object($noun);
+  if (defined($object)) {
+    if (defined($$object{"actions"}{$verb})) {
+      my $cmd = "my \$noun = '$noun'; " . $$object{"actions"}{$verb};
+      eval $cmd;
+      return 1;
     }
   }
 
@@ -247,8 +256,7 @@ sub display_splash {
 sub process {
   # display_splash();
 
-  my $loc = get_current_location();
-  describe_location($loc);
+  describe_location(get_current_location_id());
 
   set_time(0);
 
